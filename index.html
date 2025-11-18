@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Arcaea 最新版下载</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:rgba(255,255,255,.95);border-radius:20px;padding:40px 30px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.1)}
+  .logo{width:70px;height:70px;margin:0 auto 15px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;font-weight:bold}
+  h1{font-size:26px;color:#333;margin-bottom:5px}
+  .sub{color:#666;font-size:15px;margin-bottom:25px}
+  .ver-box{background:#f5f6fa;border-radius:12px;padding:18px;margin-bottom:25px}
+  .ver-label{font-size:13px;color:#888}
+  .ver-num{font-size:22px;font-weight:bold;color:#222;margin-top:4px}
+  .btn{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:17px;font-weight:bold;box-shadow:0 4px 15px rgba(102,126,234,.4);transition:all .3s}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(102,126,234,.6)}
+  .loading{margin-top:20px;color:#666}
+  .error{margin-top:20px;color:#e74c3c;background:#fee;padding:10px;border-radius:8px;display:none}
+  .spin{display:inline-block;width:18px;height:18px;border:3px solid #f3f3f3;border-top-color:#667eea;border-radius:50%;animation:spin 1s linear infinite;margin-right:6px;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">A</div>
+  <h1>Arcaea 最新版本</h1>
+  <p class="sub">官方直链 &nbsp;•&nbsp; 实时同步</p>
+  <div class="ver-box">
+    <div class="ver-label">版本号</div>
+    <div class="ver-num" id="ver">加载中…</div>
+  </div>
+  <a id="downBtn" class="btn" style="display:none" href="#">立即下载</a>
+  <div id="loading" class="loading"><span class="spin"></span>获取中…</div>
+  <div id="err" class="error"></div>
+</div>
+
+<script>
+(async()=>{
+  const loading=document.getElementById('loading');
+  const errBox=document.getElementById('err');
+  const verNum=document.getElementById('ver');
+  const downBtn=document.getElementById('downBtn');
+
+  try{
+    // ① 先走 Vercel 函数（同源，无 CORS）
+    const res=await fetch('/api/arcaea');
+    if(!res.ok) throw new Error('API 返回 '+res.status);
+    const data=await res.json();
+    if(!data.success||!data.value) throw new Error('数据格式异常');
+
+    verNum.textContent=data.value.version;
+    downBtn.href=data.value.url;
+    downBtn.style.display='inline-block';
+  }catch(e){
+    errBox.textContent='获取失败：'+e.message;
+    errBox.style.display='block';
+    verNum.textContent='—';
+  }finally{
+    loading.style.display='none';
+  }
+})();
+</script>
+</body>
+</html>
